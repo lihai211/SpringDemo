@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration status="OFF">
+	<appenders>
+		<Console name="Console" target="SYSTEM_OUT">
+			<PatternLayout
+				pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+		</Console>
+		<!-- <RollingFile name="RollingFile" fileName="logs/springdemo/log.log" 
+			filePattern="logs/springdemo/$${date:yyyy-MM}/log-%d{MM-dd-yyyy}-%i.log"> 
+			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss z} %-5level %class{36} %L 
+			%M - %msg%xEx%n" /> <SizeBasedTriggeringPolicy size="50MB" /> </RollingFile> -->
+	</appenders>
+	<loggers>
+		<!-- 总日志 -->
+		<root level="info" additivity="false">
+			<!-- <appender-ref ref="RollingFile" /> -->
+			<appender-ref ref="Console" />
+		</root>
+		<!-- 项目监听日志 -->
+		<!--<logger name="com.demo.aop" level="debug" additivity="false"> <appender-ref 
+			ref="Console" /> </logger> -->
+		<!-- mybatis打印sql日志 -->
+		<!--<logger name="com.demo.dao.mybatis" level="debug" additivity="false"> 
+			<appender-ref ref="Console" /> </logger> -->
+		<!-- mybatis日志 -->
+		<logger name="org.apache.ibatis" level="info" additivity="false">
+			<appender-ref ref="Console" />
+		</logger>
+		<!-- spring日志 -->
+		<logger name="org.springframework" level="info" additivity="false">
+			<appender-ref ref="Console" />
+		</logger>
+		<!-- c3p0日志 -->
+		<logger name="com.mchange.v2.c3p0" level="warn" additivity="false">
+			<appender-ref ref="Console" />
+		</logger>
+	</loggers>
+</configuration>

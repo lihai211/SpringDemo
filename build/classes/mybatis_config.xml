@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<settings>
+		<setting name="cacheEnabled" value="true" /><!-- 是否启用缓存 -->
+		<setting name="lazyLoadingEnabled" value="true" /><!-- 是否启用延迟加载 -->
+		<setting name="multipleResultSetsEnabled" value="true" /><!-- 允许或不允许多种结果集从一个单独 的语句中返回 -->
+		<setting name="useColumnLabel" value="true" /><!-- 使用列标签代替列名 -->
+		<setting name="useGeneratedKeys" value="false" /><!-- 允许 JDBC 支持生成的键 -->
+		<setting name="autoMappingBehavior" value="PARTIAL" /><!-- 指定 MyBatis如何自动映射列到字段/属性。PARTIAL只会自动映射简单,没有嵌套的结果。FULL会自动映射任 意复杂的结果(嵌套的或其他情况) -->
+		<setting name="defaultExecutorType" value="SIMPLE" /><!-- 配置默认的执行器。SIMPLE 执行器没 有什么特别之处。REUSE 执行器重用 预处理语句。BATCH 执行器重用语句 和批量更新 -->
+		<setting name="defaultStatementTimeout" value="6000" /><!-- 设置超时时间, 它决定驱动等待一个数 据库响应的时间 -->
+		<setting name="safeRowBoundsEnabled" value="false" /><!-- 是否采用mybatis的分页处理，他只是逻辑分页，数据量大会内存溢出 -->
+		<setting name="mapUnderscoreToCamelCase" value="false" /><!-- 是否启用数据中A_column自动映射到java类中驼峰命名的属性 -->
+		<setting name="localCacheScope" value="SESSION" /><!-- 设置本地缓存范围session:就会有数据的共享,statement:语句范围(这样就不会有数据的共享) -->
+		<setting name="jdbcTypeForNull" value="OTHER" /><!-- 设置当JDBC类型为空时,某些驱动程序 要指定值,default:OTHER -->
+		<setting name="lazyLoadTriggerMethods" value="equals,clone,hashCode,toString" /><!-- 设置触发延迟加载的方法  -->
+		<setting name="logImpl" value="LOG4J2"/><!-- 配置mybatis日志 -->
+	</settings>
+</configuration>

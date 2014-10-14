@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.demo.dao.mybatis.UserMapper">
+	<sql id="userColumns">user_id,user_name,user_type,locked,credit</sql>
+	<sql id="userMapColumns">t_user.user_id as user_id,t_user.user_name as
+		user_name,t_user.user_type as
+		user_type,t_user.locked as
+		locked,t_user.credit as
+		credit,t_board.board_id as
+		board_id,t_board.board_name as
+		board_name,t_board.board_desc as
+		board_desc,t_board.board_num as
+		board_num,t_login_log.login_log_id as
+		login_log_id,t_login_log.ip as ip,t_login_log.login_datetime as
+		login_datetime
+	</sql>
+	<resultMap type="User" id="userMap">
+		<id column="user_id" property="user_id" />
+		<result column="user_name" property="user_name" />
+		<result column="user_type" property="user_type" />
+		<result column="locked" property="locked" />
+		<result column="credit" property="credit" />
+		<association property="loginLog" javaType="LoginLog"
+			fetchType="lazy">
+			<id column="login_log_id" />
+			<result column="ip" property="ip" />
+			<result column="login_datetime" property="login_datetime" />
+		</association>
+		<collection property="manBoards" ofType="Board" fetchType="lazy">
+			<id column="board_id" property="board_id" />
+			<result column="board_name" property="board_name" />
+			<result column="board_desc" property="board_desc" />
+			<result column="board_num" property="board_num" />
+		</collection>
+	</resultMap>
+	<!-- 查找用户方法 -->
+	<select id="get" resultMap="userMap" flushCache="true">
+		select top 1
+		<include refid="userMapColumns" />
+		from t_user left join t_board_manager on
+		t_user.user_id=t_board_manager.user_id left join t_board on
+		t_board.board_id=t_board_manager.boeard_id left join t_login_log on
+		t_login_log.user_id=t_user.user_id
+		<where>
+			<if test="t.user_id != 0">
+				and t_user.user_id = #{t.user_id}
+			</if>
+			<if test="t.user_name != null and t.user_name != ''">
+				and t_user.user_name = #{t.user_name}
+			</if>
+			<if test="t.password != null and t.password != ''">
+				and t_user.password = #{t.password}
+			</if>
+			<if test="t.user_type != 0">
+				and t_user.user_type = #{t.user_type}
+			</if>
+			<if test="t.locked != 0">
+				and t_user.locked = #{t.locked}
+			</if>
+		</where>
+		order by login_datetime desc
+	</select>
+	<!-- 添加方法 -->
+	<insert id="add" keyProperty="t.user_id" useGeneratedKeys="true">
+		insert
+		into t_user
+		(user_name,password,user_type,locked,credit) values
+		(#{t.user_name},#{t.password},#{t.user_type},#{t.locked},#{t.credit})
+	</insert>
+	<!-- 更新方法 -->
+	<update id="update" parameterType="User">
+		update t_user
+		<set>
+			<if test="t.password != null and t.password != ''">
+				password = #{t.password}
+			</if>
+			<if test="t.user_type != 0">
+				,user_type = #{t.user_type}
+			</if>
+			<if test="t.locked != 0">
+				,locked = #{t.locked}
+			</if>
+			<if test="t.credit != 0">
+				,credit = #{t.credit}
+			</if>
+		</set>
+		<where>
+			<if test="t.user_id != 0">
+				user_id = #{t.user_id}
+			</if>
+			<if test="t.user_name != null and t.user_name !=''">
+				and user_name = #{t.user_name}
+			</if>
+		</where>
+	</update>
+	<!-- 删除方法 -->
+	<delete id="delete" parameterType="User">
+		delete from t_user
+		<where>
+			<if test="t.user_id != 0">
+				and user_id = #{t.user_id}
+			</if>
+			<if test="t.user_name != null and t.user_name != ''">
+				and user_name = #{t.user_name}
+			</if>
+			<if test="t.user_type != 0">
+				and user_type = #{t.user_type}
+			</if>
+			<if test="t.locked != 0">
+				and locked = #{t.locked}
+			</if>
+			<if test="t.credit != 0">
+				and credit = #{t.credit}
+			</if>
+		</where>
+	</delete>
+	<!-- 查找记录数方法 -->
+	<select id="getCount" resultType="int" parameterType="String"
+		flushCache="true">
+		select count(1) from t_user
+		<if test="condition != null">
+		</if>
+	</select>
+	<!-- 列表查询 -->
+	<select id="find" parameterType="map" resultMap="userMap"
+		flushCache="true">
+		select
+		<include refid="userMapColumns" />
+		from (
+		select
+		<if test="page != null">
+			top ${page.pageSize}
+		</if>
+		<include refid="userColumns" />
+		from t_user
+		<if test="page != null or condition != null">
+			<where>
+				<if test="page != null">
+					not exists (select 1 from (select top ${page.pageSize *
+					(page.curPage-1)} user_id from t_user
+					<if test="condition != null">
+
+					</if>
+					<if test="orderBy != null">
+						order by
+						<foreach collection="orderBy.keys" item="k" index="index"
+							separator=",">
+							<if test="orderBy[k] != null">
+								${k} ${orderBy[k]}
+							</if>
+						</foreach>
+					</if>
+					) a where a.user_id = t_user.user_id)
+				</if>
+				<if test="condition != null">
+
+				</if>
+			</where>
+		</if>
+		<if test="orderBy != null">
+			order by
+			<foreach collection="orderBy.keys" item="k" index="index"
+				separator=",">
+				<if test="orderBy[k] != null">
+					${k} ${orderBy[k]}
+				</if>
+			</foreach>
+		</if>
+		) t_user left join t_board_manager on t_user.user_id =
+		t_board_manager.user_id
+		left join t_board on
+		t_board.board_id=t_board_manager.boeard_id
+		left join t_login_log on
+		t_login_log.user_id=t_user.user_id order by login_datetime desc
+	</select>
+	<update id="IncreaseCredit">
+		update t_user set
+		credit = credit + #{credit} where
+		user_id = #{userid}
+	</update>
+</mapper>

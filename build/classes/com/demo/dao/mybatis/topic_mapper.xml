@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.demo.dao.mybatis.TopicMapper">
+	<sql id="topicColumns">
+		topic_id,board_id,topic_title,user_id,create_time,last_post,topic_views,topic_replies,digest
+	</sql>
+	<sql id="topicMapColumns">
+		t_topic.topic_id,t_topic.board_id,t_topic.topic_title,t_topic.create_time,
+		t_topic.last_post,t_topic.topic_views,t_topic.topic_replies,t_topic.digest,
+		t_user.user_id,t_user.user_name,t_user.user_type,t_user.locked,t_user.credit,
+		t_post.post_id,t_post.post_type,t_post.post_text,t_post.create_time
+	</sql>
+	<resultMap type="Topic" id="topicMap">
+		<id column="topic_id" property="topic_id" />
+		<result column="board_id" property="board_id" />
+		<result column="topic_title" property="topic_title" />
+		<result column="create_time" property="create_time" />
+		<result column="last_post" property="last_post" />
+		<result column="topic_views" property="topic_views" />
+		<result column="topic_replies" property="topic_replies" />
+		<result column="digest" property="digest" />
+		<association property="user" javaType="User" fetchType="lazy">
+			<id column="user_id" property="user_id" />
+			<result column="user_name" property="user_name" />
+			<result column="user_type" property="user_type" />
+			<result column="locked" property="locked" />
+			<result column="credit" property="credit" />
+		</association>
+		<association property="mainPost" javaType="MainPost"
+			fetchType="lazy">
+			<id column="post_id" property="post_id" />
+			<result column="post_type" property="post_type" />
+			<result column="post_title" property="post_title" />
+			<result column="post_text" property="post_text" />
+			<result column="create_time" property="create_time" />
+		</association>
+	</resultMap>
+	<!-- 查找记录数方法 -->
+	<select id="getCount" resultType="int" parameterType="String"
+		flushCache="true">
+		select count(1) from t_topic
+		<if test="condition != null">
+			<where>
+				<if test="condition.board_id != null">
+					board_id = #{condition.board_id}
+				</if>
+			</where>
+		</if>
+	</select>
+	<!-- 列表查询 -->
+	<select id="find" parameterType="map" resultMap="topicMap"
+		flushCache="true">
+		select
+		<include refid="topicMapColumns" />
+		from (
+		select
+		<if test="page != null">
+			top ${page.pageSize}
+		</if>
+		<include refid="topicColumns" />
+		from t_topic
+		<if test="page != null or condition != null or orderBy != null">
+			<where>
+				<if test="page != null">
+					not exists (select 1 from (select top ${page.pageSize *
+					(page.curPage-1)} topic_id from t_topic
+					<if test="condition != null">
+						<where>
+							<if test="condition.board_id != null">
+								board_id = #{condition.board_id}
+							</if>
+						</where>
+					</if>
+					<if test="orderBy != null">
+						order by
+						<foreach collection="orderBy.keys" item="k" index="index"
+							separator=",">
+							<if test="orderBy[k] != null">
+								${k} ${orderBy[k]}
+							</if>
+						</foreach>
+					</if>
+					) a where a.topic_id = t_topic.topic_id)
+				</if>
+				<if test="condition != null">
+					<if test="condition.board_id != null">
+						and board_id = #{condition.board_id}
+					</if>
+				</if>
+			</where>
+		</if>
+		<if test="orderBy != null">
+			order by
+			<foreach collection="orderBy.keys" item="k" index="index"
+				separator=",">
+				<if test="orderBy[k] != null">
+					${k} ${orderBy[k]}
+				</if>
+			</foreach>
+		</if>
+
+		) t_topic
+		left join t_user on t_topic.user_id = t_user.user_id
+		left join
+		t_post on t_post.topic_id = t_topic.topic_id and t_post.post_type = 1
+	</select>
+</mapper>
