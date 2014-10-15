@@ -1,0 +1,4 @@
+Spring+Mybatis+SpringMVC+Bootstarp+Jquery论坛小例子(功能不完善的，主要是要来介绍Spring+mybaits结合使用)
+
+因为这工程的原用途是给别人分享spring+mybatis整合用的，所以有些地方会出现一半注解另一半xml配置的情况。
+由于时间关系，所以很多功能是没有的
